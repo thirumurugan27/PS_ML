@@ -4,11 +4,11 @@ import {AuthContext} from "../../App";
 import Spinner from "../Spinner/Spinner";
 import ds from "../../assets/Courses/ds.png";
 import ml from "../../assets/Courses/ml.png";
-
 import DL from "../../assets/Courses/DeepLearning.png";
 import speech from "../../assets/Courses/speech.png";
 import llm from "../../assets/Courses/llm.png";
 import NLP from "../../assets/Courses/nlp.png";
+import nophoto from "../../assets/nophoto.jpg"; // Import the fallback image
 
 // SVG Icon for the back button
 const BackIcon = () => (
@@ -28,7 +28,7 @@ const BackIcon = () => (
   </svg>
 );
 
-// This object maps the short keys from `user.progress`
+// This object maps the short keys from `user.progress` to local images as fallback
 const courseDetailsMapping = {
   "Deep Learning": {
     title: "Deep Learning",
@@ -62,32 +62,83 @@ const courseDetailsMapping = {
 
 const StudentDashboard = () => {
   const [subjects, setSubjects] = useState({});
+  const [coursesData, setCoursesData] = useState({}); // New state for backend course data
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(""); // NEW
+  const [errorMessage, setErrorMessage] = useState("");
   const {user} = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchSubjectStructure = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:3001/api/questions");
-        const structure = await res.json();
+        // Fetch subject structure
+        const subjectsRes = await fetch("http://localhost:3001/api/questions");
+        const structure = await subjectsRes.json();
         setSubjects(structure);
+
+        // Fetch courses data with images from backend
+        const coursesRes = await fetch("http://localhost:3001/api/courses");
+        const coursesData = await coursesRes.json();
+        setCoursesData(coursesData);
       } catch (error) {
-        console.error("Failed to fetch subject structure:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
 
     if (user) {
-      fetchSubjectStructure();
+      fetchData();
     } else {
       setLoading(false);
     }
   }, [user]);
+
+  // Function to get the appropriate image source
+  const getImageSource = (subjectKey) => {
+    // First, try to get image from backend data
+    if (coursesData[subjectKey]?.image) {
+      return coursesData[subjectKey].image;
+    }
+
+    // If not available from backend, try local mapping
+    if (courseDetailsMapping[subjectKey]?.image) {
+      return courseDetailsMapping[subjectKey].image;
+    }
+
+    // Finally, use the fallback nophoto.png
+    return nophoto;
+  };
+
+  // Function to get course title
+  const getCourseTitle = (subjectKey) => {
+    // First, try to get title from backend data
+    if (coursesData[subjectKey]?.title) {
+      return coursesData[subjectKey].title;
+    }
+
+    // If not available from backend, try local mapping
+    if (courseDetailsMapping[subjectKey]?.title) {
+      return courseDetailsMapping[subjectKey].title;
+    }
+
+    // Finally, use the subject key as title
+    return subjectKey.toUpperCase();
+  };
+
+  // Function to handle image loading errors
+  const handleImageError = (event, subjectKey) => {
+    // If the image fails to load, try the local fallback
+    const fallbackImage = courseDetailsMapping[subjectKey]?.image;
+    if (fallbackImage && event.target.src !== fallbackImage) {
+      event.target.src = fallbackImage;
+    } else if (event.target.src !== nophoto) {
+      // If local fallback also fails, use nophoto.png
+      event.target.src = nophoto;
+    }
+  };
 
   // Modified function
   const handleStartExam = async (subject, levelNum) => {
@@ -123,8 +174,7 @@ const StudentDashboard = () => {
   // View for showing levels of a selected subject
   if (selectedSubject) {
     let firstUnlockedFound = false;
-    const courseTitle =
-      courseDetailsMapping[selectedSubject]?.title || selectedSubject;
+    const courseTitle = getCourseTitle(selectedSubject);
 
     const currentSubjectLevels = subjects[selectedSubject];
     if (!currentSubjectLevels || currentSubjectLevels.length === 0) {
@@ -258,10 +308,8 @@ const StudentDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {user.progress &&
             Object.keys(user.progress).map((subjectKey) => {
-              const courseDetails = courseDetailsMapping[subjectKey] || {
-                title: subjectKey.toUpperCase(),
-                image: "https://via.placeholder.com/400x250",
-              };
+              const courseTitle = getCourseTitle(subjectKey);
+              const courseImage = getImageSource(subjectKey);
               const levelsAvailable = subjects[subjectKey]?.length || 0;
 
               return (
@@ -275,13 +323,14 @@ const StudentDashboard = () => {
                   }
                 >
                   <img
-                    src={courseDetails.image}
-                    alt={`${courseDetails.title} course illustration`}
+                    src={courseImage}
+                    alt={`${courseTitle} course illustration`}
                     className="w-auto h-48 m-2 object-cover rounded-md"
+                    onError={(e) => handleImageError(e, subjectKey)}
                   />
                   <div className="p-4 flex-grow flex flex-col justify-between">
                     <h2 className="text-lg font-semibold text-gray-900">
-                      {courseDetails.title}
+                      {courseTitle}
                     </h2>
                     <p className="text-sm text-gray-600 mt-2">
                       {levelsAvailable > 0
