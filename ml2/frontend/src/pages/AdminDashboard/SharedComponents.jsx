@@ -1,7 +1,7 @@
 // SharedComponents.js
 // These are reusable components used across multiple tabs. Import them where needed.
 
-import React from "react";
+import React, {useState, useRef, useEffect} from "react";
 
 // Enhanced Spinner component
 export const Spinner = () => (
@@ -22,35 +22,98 @@ export const SelectInput = ({
   disabled = false,
   placeholder = "Select an option",
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const dropdownRef = useRef(null);
+  const inputRef = useRef(null);
+
   const hasOptions = options && options.length > 0;
 
+  // Find selected option label
+  const selectedOption = options?.find((opt) => opt.value === value);
+  const displayValue = selectedOption ? selectedOption.label : "";
+
+  // Filter options based on search term
+  const filteredOptions = hasOptions
+    ? options.filter((option) =>
+        option.label.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+        setSearchTerm("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleToggle = () => {
+    if (!disabled && hasOptions) {
+      setIsOpen(!isOpen);
+      if (!isOpen) {
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
+    }
+  };
+
+  const handleOptionSelect = (option) => {
+    onChange({target: {value: option.value}});
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setIsOpen(false);
+      setSearchTerm("");
+    } else if (e.key === "Enter" && filteredOptions.length === 1) {
+      handleOptionSelect(filteredOptions[0]);
+    }
+  };
+
   return (
-    <div className="relative">
-      <label className="block font-medium mb-2 text-slate-700 text-sm">
+    <div className="relative" ref={dropdownRef}>
+      <label className="block font-semibold mb-3 text-slate-700 text-sm tracking-wide">
         {label}
       </label>
+
       <div className="relative">
-        <select
-          value={value}
-          onChange={onChange}
+        {/* Main Select Button */}
+        <button
+          type="button"
+          onClick={handleToggle}
           disabled={disabled || !hasOptions}
-          className="w-full p-4 pr-12 border border-slate-300 rounded-xl text-base bg-gradient-to-b from-white to-slate-50 text-slate-800
-            transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 hover:border-purple-400
-            disabled:opacity-50 disabled:cursor-not-allowed appearance-none shadow-md hover:shadow-lg"
+          className={`w-full p-4 pr-12 text-left border-2 rounded-xl text-base transition-all duration-300 ease-in-out
+            ${
+              disabled || !hasOptions
+                ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed"
+                : isOpen
+                ? "bg-white border-purple-500 border-2"
+                : " from-white to-slate-50 border-slate-300 text-slate-700 hover:border-purple-300 "
+            }`}
         >
-          <option value="">
-            {hasOptions ? placeholder : "No options available"}
-          </option>
-          {hasOptions &&
-            options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <span className={displayValue ? "text-slate-800" : "text-slate-500"}>
+            {displayValue ||
+              (hasOptions ? placeholder : "No options available")}
+          </span>
+        </button>
+
+        {/* Dropdown Arrow */}
+        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
           <svg
-            className="w-6 h-6 text-purple-500 transition-colors duration-200 group-hover:text-purple-600"
+            className={`w-5 h-5 transition-all duration-300 ease-in-out ${
+              disabled || !hasOptions
+                ? "text-slate-300"
+                : isOpen
+                ? "text-purple-600 rotate-180"
+                : "text-purple-400"
+            }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -58,14 +121,102 @@ export const SelectInput = ({
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth="2"
+              strokeWidth="2.5"
               d="M19 9l-7 7-7-7"
-            ></path>
+            />
           </svg>
         </div>
+
+        {/* Custom Dropdown */}
+        {isOpen && hasOptions && (
+          <div className="absolute z-50 w-full mt-2 bg-white border-2 border-purple-200 rounded-xl shadow-xl shadow-purple-100/20 overflow-hidden">
+            {/* Search Input */}
+            {options.length > 5 && (
+              <div className="p-3 border-b border-purple-100">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search options..."
+                  className="w-full p-2 text-sm border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400"
+                />
+              </div>
+            )}
+
+            {/* Options List */}
+            <div className="max-h-60 overflow-y-auto">
+              {filteredOptions.length > 0 ? (
+                <>
+                  {/* Empty option */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleOptionSelect({value: "", label: placeholder})
+                    }
+                    className={`w-full text-left p-3 hover:bg-purple-50 transition-colors duration-150 border-b border-purple-50 last:border-b-0 ${
+                      value === ""
+                        ? "bg-purple-100 text-purple-800 font-medium"
+                        : "text-slate-600"
+                    }`}
+                  >
+                    <span className="text-slate-500 italic">{placeholder}</span>
+                  </button>
+
+                  {/* Actual options */}
+                  {filteredOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleOptionSelect(option)}
+                      className={`w-full text-left p-3 hover:bg-purple-50 transition-colors duration-150 border-b border-purple-50 last:border-b-0 ${
+                        value === option.value
+                          ? "bg-purple-100 text-purple-800 font-medium"
+                          : "text-slate-700 hover:text-purple-700"
+                      }`}
+                    >
+                      <span className="flex items-center justify-between">
+                        {option.label}
+                        {value === option.value && (
+                          <svg
+                            className="w-4 h-4 text-purple-600"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </span>
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <div className="p-3 text-slate-500 text-center">
+                  No options found
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* No options message */}
       {!hasOptions && (
-        <p className="mt-1 text-xs text-slate-500">No options available</p>
+        <p className="mt-2 text-xs text-slate-500 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+              clipRule="evenodd"
+            />
+          </svg>
+          No options available
+        </p>
       )}
     </div>
   );

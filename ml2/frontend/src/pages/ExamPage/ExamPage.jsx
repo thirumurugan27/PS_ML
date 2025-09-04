@@ -634,12 +634,12 @@ const ExamPage = () => {
     let baseColor = "bg-gray-400"; // Default: Not attended (no code, no validation)
 
     if (validated === true) {
-      baseColor = "bg-green-500"; // All test cases passed - GREEN
+      baseColor = "bg-green-600"; // All test cases passed - GREEN
     } else if (
       validated === false ||
       (codePresent && validated === undefined)
     ) {
-      baseColor = "bg-blue-500"; // Attended but not all passed, or code present but not yet validated - BLUE
+      baseColor = "bg-blue-600"; // Attended but not all passed, or code present but not yet validated - BLUE
     }
 
     if (index === currentQuestionIndex) {
@@ -723,7 +723,7 @@ const ExamPage = () => {
 
               {/* Attended */}
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-emerald-500 rounded-sm flex-shrink-0 shadow-sm"></div>
+                <div className="h-4 w-4 bg-green-600 rounded-sm flex-shrink-0 shadow-sm"></div>
                 <span className="text-xs font-semibold text-gray-800 leading-tight">
                   Attended All Cases Passed
                 </span>
@@ -731,7 +731,7 @@ const ExamPage = () => {
 
               {/* Attended Not Passed */}
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 bg-sky-400 rounded-sm flex-shrink-0 shadow-sm"></div>
+                <div className="h-4 w-4 bg-blue-600 rounded-sm flex-shrink-0 shadow-sm"></div>
                 <span className="text-xs font-semibold text-gray-800 leading-tight">
                   Attended Not Passed
                 </span>
