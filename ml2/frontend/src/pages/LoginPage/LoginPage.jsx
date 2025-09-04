@@ -95,7 +95,8 @@ function Login() {
         <div className="flex justify-center">
           <button
             type="button"
-            className="flex items-center border border-[#ECEEF5] rounded-md px-4 py-2 bg-white hover:shadow-md transition w-full sm:w-auto"
+            className="flex items-center border border-[#ECEEF5] rounded-md px-4 py-2 bg-white hover:shadow-md transition 
+            w-full sm:w-auto sm:items-center"
           >
             <img src={google} alt="google" className="w-5 h-5" />
             <span className="ml-2 text-sm text-black">Sign in with Google</span>

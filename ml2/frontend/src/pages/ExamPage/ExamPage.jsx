@@ -71,7 +71,6 @@ const CodeCell = ({
     (subject === "Speech Recognition" && level === "1")
   );
 
-
   return (
     <div className="flex flex-col md:flex-row h-full w-full p-4 overflow-hidden">
       {/* Left Pane: Question Description, Example, and Validation Results */}
@@ -618,7 +617,7 @@ const ExamPage = () => {
     displayAlert(
       confirmationMessage,
       "confirm",
-      handleSubmitExam,
+      handleSubmitExam
       // () => console.log("Submission cancelled.") // Optional: log cancellation
     );
   };
@@ -712,25 +711,41 @@ const ExamPage = () => {
               </button>
             ))}
           </div>
-          <div className="bg-gray-100 max-w-[180px] mt-10 p-4 rounded-lg shadow">
-  <div className="flex items-center gap-2 mb-2">
-    <div className="h-4 w-4 bg-[#7D53F6] rounded"></div>
-    <span className="text-sm text-gray-700">- Current Question</span>
-  </div>
-  <div className="flex items-center gap-2 mb-2">
-    <div className="h-4 w-4 bg-green-400 rounded"></div>
-    <span className="text-sm text-gray-700">- Attended</span>
-  </div>
-  <div className="flex items-center gap-2 mb-2">
-    <div className="h-4 w-4 bg-blue-400 rounded"></div>
-    <span className="text-sm text-gray-700">- Attended Not Passed</span>
-  </div>
-  <div className="flex items-center gap-2">
-    <div className="h-4 w-4 bg-gray-400 rounded"></div>
-    <span className="text-sm text-gray-700">- Not Attended</span>
-  </div>
-</div>
+          <div className="bg-white min-h-0 max-w-[200px] mt-8 p-4 rounded-2xl shadow-lg border border-gray-100">
+            <div className="space-y-2">
+              {/* Current Question */}
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-[#7D53F6] rounded-sm flex-shrink-0 shadow-sm"></div>
+                <span className="text-xs font-semibold text-gray-800 leading-tight">
+                  Current Question
+                </span>
+              </div>
 
+              {/* Attended */}
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-emerald-500 rounded-sm flex-shrink-0 shadow-sm"></div>
+                <span className="text-xs font-semibold text-gray-800 leading-tight">
+                  Attended All Cases Passed
+                </span>
+              </div>
+
+              {/* Attended Not Passed */}
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-sky-400 rounded-sm flex-shrink-0 shadow-sm"></div>
+                <span className="text-xs font-semibold text-gray-800 leading-tight">
+                  Attended Not Passed
+                </span>
+              </div>
+
+              {/* Not Attended */}
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-slate-400 rounded-sm flex-shrink-0 shadow-sm"></div>
+                <span className="text-xs font-semibold text-gray-800 leading-tight">
+                  Not Attended
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Main Content Area - Split into two panes for question and code */}
