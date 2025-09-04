@@ -1,0 +1,22 @@
+##### DEFINING THE PROBLEM
+
+
+Project ID,Title,Description,Dataset Paths,Parts,Expected Outputs,Validation Method,Solution File
+
+**SAMPLE**
+
+
+REVIEWS_V3_001,Tokenization & Sentiment Encoding of Product Reviews,"A project to process product reviews by tokenizing text and encoding sentiments into numerical values.",reviews.txt,"tokenization_check, sentiment_encoding_check, csv_similarity_check","Tokenized reviews list, Numerical sentiment encoding, Final structured CSV","Text similarity, CSV similarity",solution.csv
+
+
+##### ELABORATING THE PROBLEM
+
+
+
+Part ID,Title,Task Description,Expected Output,Validation Method,Similarity Threshold,Dataset Reference
+
+**SAMPLE**
+
+tokenization_check,Part 1: Tokenization,"Read reviews from reviews.txt and tokenize them into words and punctuation marks.","Print tokenized reviews (first 8) e.g., [['I','love','this','product','!','It',''s','amazing','!','!','!'], ...]",Text similarity check,1.0,reviews.txt
+sentiment_encoding_check,Part 2: Sentiment Encoding,"Convert sentiment labels (positive, negative, neutral) into numbers (1, 0, 2).","Print sentiment array for first 8 reviews e.g., Numerical Sentiment: [1, 0, 1, 0, 1, 0, 1, 2]",Text similarity check,0.8,reviews.txt
+csv_similarity_check,Part 3: Structured Output,"Save processed reviews into tokenized_sentiment.csv with columns: Index, Original Review, Tokenized Review, Original Sentiment, Numerical Sentiment.","tokenized_sentiment.csv file (must match solution file).",CSV similarity check,0.8,reviews.txt

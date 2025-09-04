@@ -1,0 +1,19 @@
+#####    DEFINING THE PROBLEM     #####
+
+
+"Project ID","Title","Description","Dataset Paths","Parts","Expected Outputs","Validation Method","Solution File"
+
+** SAMPLE **
+"LR_XYZ_001","Linear Regression: XYZ Dataset","A project to predict house prices using linear regression on the XYZ dataset.","train.csv,test.csv","data_inspection,model_training,prediction","Cleaned data summary,Model performance metrics,Predictions CSV","Text similarity,Code execution,CSV similarity","solution.csv"
+
+
+
+
+
+#####    ELABORATING THE PROBLEM     #####
+
+** SAMPLE **
+"Part ID","Title","Task Description","Expected Output","Validation Method","Similarity Threshold","Dataset Reference"
+"data_inspection","Part 1: Data Inspection","Load training data, check missing values","Print missing counts (e.g., LotFrontage 259)","Text similarity check","0.8","train.csv"
+"model_training","Part 2: Model Training & Evaluation","Preprocess, train linear regression, evaluate","Print RMSE & R²","Text similarity check","0.8","train.csv"
+"prediction","Part 3: Prediction","Use trained model to predict test.csv","Save predictions to submission.csv with columns: Id, SalePrice","CSV similarity check","0.8","test.csv"

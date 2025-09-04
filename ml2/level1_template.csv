@@ -1,0 +1,3 @@
+Problem ID,Title,Description,Test Case Input,Expected Output
+SAMPLE_001,Sample Problem,"This is a sample description of the problem where students must write a program to solve it.","Hello world","['Hello', 'world']"
+SAMPLE_001,Sample Problem,"This is a sample description of the problem where students must write a program to solve it.","Data Science is fun","['Data', 'Science', 'is', 'fun']"
